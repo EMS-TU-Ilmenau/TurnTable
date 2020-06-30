@@ -86,7 +86,7 @@ class TurnTableControl:
         
         :param speed: number between -1000...1000
         '''
-        self.send(f'{self.axStr}:VEL {-speed}')
+        self.send(f'{self.axStr}:VEL {speed}')
     
 
     @property
@@ -102,10 +102,10 @@ class TurnTableControl:
         '''
         :returns: current table angle in degrees
         '''
-        rotorSteps = -int(self.send(f'{self.axStr}:POS?'))
+        rotorSteps = int(self.send(f'{self.axStr}:POS?'))
         # convert rotor step position to table position
         tablePos = 360*rotorSteps/self.tableRevSteps
-        return tablePos%360
+        return tablePos
     
 
     @position.setter
@@ -114,9 +114,9 @@ class TurnTableControl:
         Defines the current table angle in degrees
         '''
         # convert table position to rotor steps
-        rotorSteps = round(val*self.tableRevSteps/360)
+        rotorSteps = int(round(val*self.tableRevSteps/360))
         # send to board
-        self.send(f'{self.axStr}:POS {-rotorSteps}')
+        self.send(f'{self.axStr}:POS {rotorSteps}')
 
 
     @property
