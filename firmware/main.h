@@ -35,5 +35,3 @@ void sendUSARTChar(const char c);
 void sendUSARTString(const char* pStr);
 void configTimer1();
 void configTimer2();
-int16_t parseNum(const char* strP);
-void sendNum(int16_t num);

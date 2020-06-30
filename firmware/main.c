@@ -54,12 +54,12 @@ void parseCommand(char* strP) {
 		if (strncmp(cmdP, "VEL", 3) == 0) {
 			// set speed (-1000...1000)
 			cmdP += 3;
-			tarStepVel = parseNum(cmdP);
+			tarStepVel = strtol(cmdP, NULL, RADIX);
 			// set direction
 			if (tarStepVel >= 0) {
-				PORTA |= (1 << DIR_PIN); // forward
+				PORTA &= ~(1 << DIR_PIN); // table forward
 			} else {
-				PORTA &= ~(1 << DIR_PIN); // backwards
+				PORTA |= (1 << DIR_PIN); // table backward
 			}
 			// set pwm
 			OCR1B = (uint16_t)(abs(tarStepVel));
@@ -67,9 +67,10 @@ void parseCommand(char* strP) {
 			// current position
 			cmdP += 3;
 			if (*cmdP == '?') {
-				sendNum(curStepPos);
+				ltoa(curStepPos, uartSendStr, RADIX);
+				sendUSARTString(uartSendStr);
 			} else {
-				curStepPos = parseNum(cmdP);
+				curStepPos = strtol(cmdP, NULL, RADIX);
 			}
 		} else if (strncmp(cmdP, "PER?", 4) == 0) {
 			// get current step period
@@ -77,7 +78,8 @@ void parseCommand(char* strP) {
 			NOTE: due to the prescaler of 1024 and the clock freq of 8 MHz, 
 			the step period is in [us]/128. So multiply by 128 to get it in us.
 			*/
-			sendNum(curStepPeriod);
+			utoa(curStepPeriod, uartSendStr, RADIX);
+			sendUSARTString(uartSendStr);
 		} else {
 			// no valid command
 			strcpy(uartSendStr, "No valid command: ");
@@ -92,18 +94,6 @@ void parseCommand(char* strP) {
 			sendUSARTString(CMD_ID);
 		}
 	}
-}
-
-int16_t parseNum(const char* strP) {
-	// parses the string for a decimal number
-	char *nxt;
-	return strtol(strP, &nxt, RADIX);
-}
-
-void sendNum(int16_t num) {
-	// converts a decimal number to string and sends it over USART
-	itoa(num, uartSendStr, RADIX);
-	sendUSARTString(uartSendStr);
 }
 
 void configGPIO() {
