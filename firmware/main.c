@@ -56,7 +56,7 @@ void parseCommand(char* strP) {
 			cmdP += 3;
 			tarStepVel = strtol(cmdP, NULL, RADIX);
 			// set direction
-			if (tarStepVel >= 0) {
+			if (tarStepVel < 0) {
 				PORTA &= ~(1 << DIR_PIN); // table forward
 			} else {
 				PORTA |= (1 << DIR_PIN); // table backward
