@@ -6,20 +6,6 @@
 #include "main.h" // for main setup
 
 
-ISR(USART0_RX_vect) {
-	// receiving chars via UART Rx
-	char nextChar = UDR0;
-	if (nextChar != STR_TERM && uartStrCount < UART_MAXSTRLEN) {
-		// still getting valid chars
-		uartReceiveStr[uartStrCount++] = nextChar;
-	} else {
-		// end of string
-		uartReceiveStr[uartStrCount] = STR_TERM;
-	  	uartStrCount = 0;
-		gotUSARTInterrupt = TRUE;
-	}
-}
-
 ISR(TIMER2_CAPT_vect) {
 	// interrupt for timer2 input capture
 	curStepPeriod = ICR2; // capture timer counter value
@@ -38,15 +24,32 @@ int main() {
 	// activating interrupts
 	sei();
 	while(1) {
-		if (gotUSARTInterrupt) {
-			gotUSARTInterrupt = FALSE;
+		receiveUSARTChar();
+		if (gotCommand) {
+			gotCommand = FALSE;
 			parseCommand((char*)(uartReceiveStr));
 		}
 	}
 	return 0;
 }
 
-void parseCommand(char* strP) {
+inline void receiveUSARTChar() {
+	// collect newly arrived bytes
+	if (!(UCSR0A & (1 << RXC0))) return; // no new char received yet
+	// new char available
+	char nextChar = UDR0;
+	if (nextChar != STR_TERM && uartStrCount < UART_MAXSTRLEN) {
+		// still getting valid chars
+		uartReceiveStr[uartStrCount++] = nextChar;
+	} else {
+		// end of string
+		uartReceiveStr[uartStrCount] = STR_TERM;
+	  	uartStrCount = 0;
+		gotCommand = TRUE;
+	}
+}
+
+inline void parseCommand(char* strP) {
 	// search entry point: our axis with ID ("AX<ID>")
 	char* cmdP = strstr(strP, CMD_ID);
 	if (cmdP) {
@@ -107,8 +110,6 @@ void configUSART0() {
 	UBRR0L = (uint8_t)UART_UBRR;
 	// enable receiver and transmitter pins
 	UCSR0B = (1 << RXEN0) | (1 << TXEN0);
-	// enable receiver interrupt
-	UCSR0B |= (1 << RXCIE0);
 	// frame format: 8N1 (is initially set anyway)
 	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
 	// double speed because the error is too high (-7%) for baud 9600 without U2X

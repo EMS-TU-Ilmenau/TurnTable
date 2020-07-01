@@ -18,11 +18,10 @@
 #define MAX_PWM 1000 // pwm period in us
 
 // variables
-volatile uint8_t uartStrCount = 0;
-volatile uint8_t gotUSARTInterrupt = FALSE;
-volatile char uartReceiveStr[UART_MAXSTRLEN] = "";
+uint8_t uartStrCount = 0;
+uint8_t gotCommand = FALSE;
+char uartReceiveStr[UART_MAXSTRLEN] = "";
 char uartSendStr[UART_MAXSTRLEN] = "";
-volatile uint8_t gotTachoInterrupt = FALSE;
 volatile int32_t curStepPos = 0;
 volatile int16_t tarStepVel = 0;
 volatile uint16_t curStepPeriod = 0;
@@ -30,6 +29,7 @@ volatile uint16_t curStepPeriod = 0;
 // prototypes
 void configGPIO();
 void configUSART0();
+void receiveUSARTChar();
 void parseCommand(char* pCmd);
 void sendUSARTChar(const char c);
 void sendUSARTString(const char* pStr);
