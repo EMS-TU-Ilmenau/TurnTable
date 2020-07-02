@@ -60,9 +60,9 @@ inline void parseCommand(char* strP) {
 			tarStepVel = strtol(cmdP, NULL, RADIX);
 			// set direction
 			if (tarStepVel < 0) {
-				PORTA &= ~(1 << DIR_PIN); // table forward
-			} else {
 				PORTA |= (1 << DIR_PIN); // table backward
+			} else {
+				PORTA &= ~(1 << DIR_PIN); // table forward
 			}
 			// set pwm
 			OCR1B = (uint16_t)(abs(tarStepVel));
