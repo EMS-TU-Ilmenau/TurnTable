@@ -1,7 +1,13 @@
 # Turntable
 Construction of a low-cost turntable positioner including 3D-printable parts and software to control it.
 
-![Assembly](construction/Assembly.png)
+![Construction](construction.jpeg)
 
 ## Construction
-The individual parts are made using FreeCAD. The assembly was made poorly using the A2plus workbench, which can be installed via the Addon-Manager.
+3D-printable parts and assembly.
+
+## Firmware
+Quick-and-dirty mash-up of the [StepperDrive controller board](https://github.com/EMS-TU-Ilmenau/StepperDrive) and cheap e-Bike brushless motor controller (with hall sensor inputs).
+
+## Interface
+Python interface to talk to the firmware and do the steps to degree conversions.
